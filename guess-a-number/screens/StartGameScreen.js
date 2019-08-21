@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, Button, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
+import { StyleSheet, View, Button, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
 
 // Components
 import Card from './../components/Card';
 import Input from './../components/Input';
+import NumberContainer from './../components/NumberContainer';
+import TitleText from './../components/TitleText';
+import BodyText from './../components/BodyText';
+import MainButton from './../components/MainButton';
 
 import Colors from './../constants/colors';
 
-const StartGameScreen = () => {
+const StartGameScreen = props => {
     const [enteredNumber, setEnteredNumber] = useState('');
     const [selectedNumber, setSelectedNumber] = useState();
     const [isConfirmed, setIsConfirmed] = useState(false);
@@ -34,20 +38,27 @@ const StartGameScreen = () => {
         }
 
         setIsConfirmed(true);
-        setSelectedNumber(enteredNumber);
+        setSelectedNumber(chosenNum);
         setEnteredNumber('');
+        Keyboard.dismiss();
     };
 
     let confirmedOutput;
 
     if (isConfirmed) {
-        confirmedOutput = <Text>Chosen Number: {selectedNumber}</Text>
+        confirmedOutput = (
+            <Card style={styles.selectedNumber}>
+                <BodyText>You selected</BodyText>
+                <NumberContainer>{selectedNumber}</NumberContainer>
+                <MainButton onPress={() => props.onGameStart(selectedNumber)}>START GAME</MainButton>
+            </Card>
+        );
     }
 
     return (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
             <View style={styles.screen}>
-                <Text style={styles.title}>Start a New Game!</Text>
+                <TitleText style={styles.title}>Start a New Game!</TitleText>
                 <Card style={styles.inputContainer}>
                     <View style={styles.inputContainer}>
                         <Input
@@ -98,6 +109,10 @@ const styles = StyleSheet.create({
     input: {
         width: 50,
         textAlign: 'center'
+    },
+    selectedNumber: {
+        marginTop: 20,
+        alignItems: 'center'
     }
 });
 
