@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, Alert, ScrollView, FlatList } from 'react-native';
+import { StyleSheet, View, Alert, FlatList, Dimensions, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 // Components
@@ -38,12 +38,25 @@ const renderListItem = (listLength, itemData) => {
 const GameScreen = props => {
     const [currentGuess, setCurrentGuess] = useState(generateRandomNum(1, 99, props.selectedNum));
     const [pastGuesses, setPastGuesses] = useState([]);
+    const [availableDeviceHeight, setAvailableDeviceHeight] = useState(Dimensions.get('window').height);
     const minNum = useRef(1);
     const maxNum = useRef(99);
 
     useEffect(() => {
         if (currentGuess === props.selectedNum) {
             props.onGameOver(pastGuesses.length + 1);
+        }
+    });
+
+    useEffect(() => {
+        const updateLayout = () => {
+            setAvailableDeviceHeight(Dimensions.get('window').height);
+        };
+
+        Dimensions.addEventListener('change', updateLayout);
+
+        return () => {
+            Dimensions.removeEventListener('change', updateLayout);
         }
     });
 
@@ -65,25 +78,42 @@ const GameScreen = props => {
         }
     };
 
-    return (
-        <View style={styles.screen}>
-            <BodyText>Opponent`s Guess</BodyText>
-            <NumberContainer style={styles.numberContainer}>{currentGuess}</NumberContainer>
-            <Card style={styles.buttonContainer}>
+    let buttonControlsView;
+
+    if (availableDeviceHeight < 500) {
+        buttonControlsView = (
+            <View style={styles.lanscapeControlsContainer}>
                 <MainButton onPress={() => nextGuessHandler('lower')}><Ionicons name="md-arrow-down" size={24} color='white' /></MainButton>
+                <NumberContainer style={styles.numberContainer}>{currentGuess}</NumberContainer>
                 <MainButton onPress={() => nextGuessHandler('greater')}><Ionicons name="md-arrow-up" size={24} color='white' /></MainButton>
-            </Card>
-            <View style={styles.listContainer}>
-                {/* <ScrollView contentContainerStyle={styles.list}>
-                    {pastGuesses.map((guess, index) => renderListItem(guess, pastGuesses.length - index))}
-                </ScrollView> */}
-                <FlatList
-                    keyExtractor={() => Math.random().toString()}
-                    data={pastGuesses}
-                    renderItem={renderListItem.bind(this, pastGuesses.length)}
-                    contentContainerStyle={styles.list} />
             </View>
-        </View>
+        );
+    } else {
+        buttonControlsView = (
+            <View style={{ alignItems: 'center' }}>
+                <NumberContainer style={styles.numberContainer}>{currentGuess}</NumberContainer>
+                <Card style={{ ...styles.buttonContainer, marginTop: availableDeviceHeight > 600 ? 20 : 5 }}>
+                    <MainButton onPress={() => nextGuessHandler('lower')}><Ionicons name="md-arrow-down" size={24} color='white' /></MainButton>
+                    <MainButton onPress={() => nextGuessHandler('greater')}><Ionicons name="md-arrow-up" size={24} color='white' /></MainButton>
+                </Card>
+            </View>
+        );
+    }
+
+    return (
+        <ScrollView>
+            <View style={styles.screen}>
+                <BodyText>Opponent`s Guess</BodyText>
+                {buttonControlsView}
+                <View style={styles.listContainer}>
+                    <FlatList
+                        keyExtractor={() => Math.random().toString()}
+                        data={pastGuesses}
+                        renderItem={renderListItem.bind(this, pastGuesses.length)}
+                        contentContainerStyle={styles.list} />
+                </View>
+            </View>
+        </ScrollView>
     );
 };
 
@@ -95,19 +125,25 @@ const styles = StyleSheet.create({
     },
     numberContainer: {
         width: 75,
-        maxWidth: '20%'
+        maxWidth: '30%'
     },
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 20,
         width: 400,
-        maxWidth: '64%'
+        maxWidth: '70%'
+    },
+    lanscapeControlsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        width: '80%',
+        alignItems: 'center'
     },
     listContainer: {
-        width: '80%',
+        // width: '80%',
+        width: Dimensions.get('window').width < 400 ? '90%' : '70%',
         flex: 1,
-        alignItems: 'center',
+        alignItems: 'center'
     },
     list: {
         flexGrow: 1,
