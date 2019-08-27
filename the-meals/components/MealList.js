@@ -1,16 +1,22 @@
 import React from 'react';
 import { StyleSheet, View, FlatList } from 'react-native';
+import { useSelector } from 'react-redux';
 
 // Components
 import MealItem from './../components/MealItem';
 
 const MealList = props => {
+    const favouriteMeals = useSelector(state => state.meals.favourites);
 
-    const redirectToMealDetails = (mealId) => {
+    const redirectToMealDetails = (mealId, mealTitle) => {
+        const isFav = favouriteMeals.some(meal => meal.id, mealId);
+
         props.navigation.navigate({
             routeName: 'MealDetails',
             params: {
-                mealId
+                mealId,
+                mealTitle,
+                isFav
             }
         });
     };
@@ -22,7 +28,7 @@ const MealList = props => {
         complexity={itemData.item.complexity}
         affordability={itemData.item.affordability}
         imgUrl={itemData.item.imageUrl}
-        onClick={() => redirectToMealDetails(itemData.item.id)} />
+        onClick={() => redirectToMealDetails(itemData.item.id, itemData.item.title)} />
     };
 
     return (

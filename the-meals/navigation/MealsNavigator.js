@@ -86,7 +86,7 @@ const mainNavigator = createDrawerNavigator({
     MealsFavs: {
         screen: MealsFavNavigator,
         navigationOptions: {
-            drawerLabel: 'Favourites'
+            drawerLabel: 'Meals'
         }
     },
     Filters: FiltersNavigator
