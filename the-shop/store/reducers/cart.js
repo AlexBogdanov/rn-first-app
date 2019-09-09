@@ -1,4 +1,4 @@
-import { ADD_TO_CART, REMOVE_FROM_CART } from './../actions/cart';
+import { ADD_TO_CART, REMOVE_FROM_CART, CLEAR_CART } from './../actions/cart';
 
 import CartItem from './../../models/cartItem';
 
@@ -76,6 +76,10 @@ const cartReducer = (state = initialState, action) => {
                 };
             }
 
+            return updatedState;
+        }
+        case CLEAR_CART: {
+            const updatedState = initialState;
             return updatedState;
         }
         default: {

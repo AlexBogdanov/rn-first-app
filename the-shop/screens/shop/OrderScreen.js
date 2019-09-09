@@ -1,20 +1,49 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { FlatList, Platform } from 'react-native';
+import { useSelector } from 'react-redux';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+
+// Components
+import CustomHeaderButton from './../../components/common/CustomHeaderButton';
+import OrderItem from './../../components/shop/OrderItem';
 
 const OrderScreen = props => {
+    const orders = useSelector(state => state.orders.orders);
+
+    const renderItem = itemData => {
+        const { totalAmount, readableDate, items } = itemData.item;
+        return (
+            <OrderItem
+                price={totalAmount}
+                date={readableDate}
+                items={items} />
+        );
+    };
+
     return (
-        <View style={styles.screen}>
-            <Text>OrderScreen</Text>
-        </View>
+        <FlatList
+            keyExtractor={item => item.id}
+            data={orders}
+            renderItem={renderItem} />
     );
 };
 
-const styles = StyleSheet.create({
-    screen: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center'
-    }
-});
+OrderScreen.navigationOptions = navData => {
+    const toggleDrawer = () => {
+        navData.navigation.toggleDrawer();
+    };
+
+    return {
+        headerTitle: 'Your Orders',
+        headerLeft: (
+            <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+                <Item
+                    title="Menu"
+                    iconName={Platform.OS === 'android' ? "md-menu" : "ios-menu"}
+                    onPress={toggleDrawer} />
+            </HeaderButtons>
+        )
+    };
+};
 
 export default OrderScreen;

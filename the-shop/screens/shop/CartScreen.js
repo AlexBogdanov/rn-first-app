@@ -7,7 +7,10 @@ import DefaultText from './../../components/common/DefaultText';
 import TitleText from './../../components/common/TitleText';
 import CartItem from './../../components/shop/CartItem';
 
+// Actions
 import * as cartActions from './../../store/actions/cart';
+import * as ordersActions from './../../store/actions/orders';
+
 import Colors from './../../constansts/Colors';
 
 const CartScreen = props => {
@@ -27,6 +30,16 @@ const CartScreen = props => {
         cartItems.push(cartItem);
     });
 
+    cartItems.sort((a, b) => {
+        if (a.id > b.id) {
+            return 1;
+        } else if (a.id < b.id) {
+            return -1;
+        } else {
+            return 0;
+        }
+    });
+
     const removeItem = productId => {
         dispatch(cartActions.removeFromCart(productId));
     };
@@ -43,13 +56,18 @@ const CartScreen = props => {
                     onDelete={removeItem} />
     };
 
+    const createOrder = () => {
+        dispatch(ordersActions.addOrder(cartItems, totalAmount));
+        dispatch(cartActions.clearCart());
+    };
+
     return (
         <View style={styles.screen}>
             <View style={styles.summary}>
                 <DefaultText>
                     Total amount: <TitleText style={styles.title}>${totalAmount.toFixed(2)}</TitleText>
                 </DefaultText>
-                <Button color={Colors.primary} title="Order Now" disabled={cartItems.length === 0} />
+                <Button color={Colors.primary} title="Order Now" disabled={cartItems.length === 0} onPress={createOrder} />
             </View>
             <View style={styles.list}>
                 <TitleText style={styles.listText}>Cart Items:</TitleText>
@@ -60,6 +78,10 @@ const CartScreen = props => {
             </View>
         </View>
     );
+};
+
+CartScreen.navigationOptions = {
+    headerTitle: 'Your Cart'
 };
 
 const styles = StyleSheet.create({

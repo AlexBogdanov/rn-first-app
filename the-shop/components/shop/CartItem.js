@@ -10,7 +10,7 @@ import Colors from './../../constansts/Colors';
 
 const CartItem = props => {
     return (
-        <View style={styles.wrapper}>
+        <View style={{ ...styles.wrapper, ...props.style }}>
             <View style={styles.cartItem}>
                 <TitleText style={styles.title}>{props.title}</TitleText>
                 <DefaultText>${props.price}</DefaultText>
