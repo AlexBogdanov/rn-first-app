@@ -5,7 +5,7 @@ import { AppLoading } from 'expo';
 import * as Fonts from 'expo-font'
 import { composeWithDevTools } from 'redux-devtools-extension';
 
-import ProductsNavigator from './navigation/ProductsNavigator';
+import ShopNavigator from './navigation/ShopNavigator';
 import rootReducer from './store/reducers';
 
 const store = createStore(rootReducer, composeWithDevTools());
@@ -25,7 +25,7 @@ export default function App() {
   } else {
     return (
       <Provider store={store}>
-        <ProductsNavigator />
+        <ShopNavigator />
       </Provider>
     );
   }

@@ -12,17 +12,18 @@ const OrderItem = props => {
     };
 
     return (
-        <View style={styles.orderItem}>
-            <View style={styles.info}>
-                <Text style={styles.totalAmount}>${props.price.toFixed(2)}</Text>
-                <Text style={styles.date}>{props.date}</Text>
-            </View>
-            <View>
-                <Button title="Show Details" color={Colors.primary} onPress={toggleShowDetails} />
-            </View>
-
-            {showDetails && (
+        <View>
+            <View style={styles.orderItem}>
+                <View style={styles.info}>
+                    <Text style={styles.totalAmount}>${props.price.toFixed(2)}</Text>
+                    <Text style={styles.date}>{props.date}</Text>
+                </View>
                 <View>
+                    <Button title={showDetails ? "Hide Details" : "Show Details"} color={Colors.primary} onPress={toggleShowDetails} />
+                </View>
+            </View>
+            {showDetails && (
+                <View style={styles.orderItem}>
                     {props.items.map((item, index) => {
                         return (
                             <CartItem
@@ -30,8 +31,7 @@ const OrderItem = props => {
                                 title={item.title}
                                 price={item.price}
                                 quantity={item.quantity}
-                                sum={item.sum}
-                                style={styles.cartItem} />
+                                sum={item.sum} />
                         );
                     })}
                 </View>
@@ -49,7 +49,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         margin: 20,
         padding: 10,
-        alignItems: 'center'
+        alignItems: 'center',
+        minHeight: 10
     },
     info: {
         flexDirection: 'row',
@@ -65,9 +66,6 @@ const styles = StyleSheet.create({
         fontFamily: 'open-sans',
         fontSize: 16,
         color: '#888'
-    },
-    cartItem: {
-        height: 12
     }
 });
 

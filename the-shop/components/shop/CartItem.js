@@ -9,23 +9,28 @@ import DefaultText from './../common/DefaultText';
 import Colors from './../../constansts/Colors';
 
 const CartItem = props => {
+    const cartItemStyle = props.isDeletable
+        ? styles.cartItem : { ...styles.cartItem, width: '100%' };
+
     return (
-        <View style={{ ...styles.wrapper, ...props.style }}>
-            <View style={styles.cartItem}>
+        <View style={styles.wrapper}>
+            <View style={cartItemStyle}>
                 <TitleText style={styles.title}>{props.title}</TitleText>
                 <DefaultText>${props.price}</DefaultText>
                 <DefaultText>{props.quantity} pcs.</DefaultText>
                 <TitleText style={styles.sum}>${props.sum}</TitleText>
             </View>
-            <View style={styles.actions}>
-                <TouchableOpacity>
-                    <Ionicons
-                        name="md-trash"
-                        size={23}
-                        color="red"
-                        onPress={() => props.onDelete(props.id)} />
-                </TouchableOpacity>
-            </View>
+            {props.isDeletable && (
+                <View style={styles.actions}>
+                    <TouchableOpacity>
+                        <Ionicons
+                            name="md-trash"
+                            size={23}
+                            color="red"
+                            onPress={() => props.onDelete(props.id)} />
+                    </TouchableOpacity>
+                </View>
+            )}
         </View>
     );
 };

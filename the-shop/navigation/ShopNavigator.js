@@ -4,12 +4,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { Platform } from 'react-native';
 
 // Screens
-import ProductsOverviewScreen from './../screens/shop/ProductsOverviewScreen';
-import ProductDetailsScreen from './../screens/shop/ProductDetailsScreen';
-import CartScreen from './../screens/shop/CartScreen';
-import OrdersScreen from './../screens/shop/OrderScreen';
+import ProductsOverviewScreen from '../screens/shop/ProductsOverviewScreen';
+import ProductDetailsScreen from '../screens/shop/ProductDetailsScreen';
+import CartScreen from '../screens/shop/CartScreen';
+import OrdersScreen from '../screens/shop/OrderScreen';
+import UserProductsScreen from './../screens/user/UserProductsScreen';
+import EditProductScreen from './../screens/user/EditProductScreen';
 
-import Colors from './../constansts/Colors';
+import Colors from '../constansts/Colors';
 
 const defaultNavigationOptions = {
     headerStyle: {
@@ -42,7 +44,7 @@ const ProductsNavigator = createStackNavigator({
     defaultNavigationOptions
 });
 
-const OrdersNavigatior = createStackNavigator({
+const OrdersNavigator = createStackNavigator({
     Orders: OrdersScreen
 }, {
     navigationOptions: {
@@ -58,9 +60,27 @@ const OrdersNavigatior = createStackNavigator({
     defaultNavigationOptions
 });
 
+const AdminNavigator = createStackNavigator({
+    UserProducts: UserProductsScreen,
+    EditProduct: EditProductScreen
+}, {
+    navigationOptions: {
+        drawerIcon: drawerCongif => {
+            return (
+                <Ionicons
+                    name={Platform.OS === 'android' ? "md-create" : "ios-create"}
+                    size={23}
+                    color={drawerCongif.tintColor} />
+            )
+        }
+    },
+    defaultNavigationOptions
+})
+
 const ShopNavigator = createDrawerNavigator({
     Products: ProductsNavigator,
-    Orders: OrdersNavigatior
+    Orders: OrdersNavigator,
+    User: AdminNavigator
 }, {
     contentOptions: {
         activeTintColor: Colors.primary

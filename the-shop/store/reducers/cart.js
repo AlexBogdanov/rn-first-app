@@ -1,4 +1,5 @@
 import { ADD_TO_CART, REMOVE_FROM_CART, CLEAR_CART } from './../actions/cart';
+import { DELETE_PRODUCT } from './../actions/products';
 
 import CartItem from './../../models/cartItem';
 
@@ -80,6 +81,24 @@ const cartReducer = (state = initialState, action) => {
         }
         case CLEAR_CART: {
             const updatedState = initialState;
+            return updatedState;
+        }
+        case DELETE_PRODUCT: {
+            const { productId } = action;
+            const item = state.items[productId];
+
+            if (!item) {
+                return state;
+            }
+
+            const updatedItems = { ...state.items };
+            delete updatedItems[productId];
+            const updatedState = {
+                ...state,
+                items: updatedItems,
+                totalAmount: removeSum(state.totalAmount, item.price * item.quantity)
+            };
+
             return updatedState;
         }
         default: {

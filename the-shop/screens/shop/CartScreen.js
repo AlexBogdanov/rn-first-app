@@ -53,7 +53,8 @@ const CartScreen = props => {
                     price={item.price}
                     quantity={item.quantity}
                     sum={item.sum}
-                    onDelete={removeItem} />
+                    onDelete={removeItem}
+                    isDeletable />
     };
 
     const createOrder = () => {
