@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, Button } from 'react-native';
 
+// Components
 import CartItem from './CartItem';
+import Card from './../common/Card';
+
 import Colors from './../../constansts/Colors';
 
 const OrderItem = props => {
@@ -13,7 +16,7 @@ const OrderItem = props => {
 
     return (
         <View>
-            <View style={styles.orderItem}>
+            <Card style={styles.orderItem}>
                 <View style={styles.info}>
                     <Text style={styles.totalAmount}>${props.price.toFixed(2)}</Text>
                     <Text style={styles.date}>{props.date}</Text>
@@ -21,9 +24,9 @@ const OrderItem = props => {
                 <View>
                     <Button title={showDetails ? "Hide Details" : "Show Details"} color={Colors.primary} onPress={toggleShowDetails} />
                 </View>
-            </View>
+            </Card>
             {showDetails && (
-                <View style={styles.orderItem}>
+                <Card style={styles.orderItem}>
                     {props.items.map((item, index) => {
                         return (
                             <CartItem
@@ -34,7 +37,7 @@ const OrderItem = props => {
                                 sum={item.sum} />
                         );
                     })}
-                </View>
+                </Card>
             )}
         </View>
     );
@@ -44,9 +47,6 @@ const styles = StyleSheet.create({
     orderItem: {
         flex: 1,
         width: '90%',
-        elevation: 5,
-        borderRadius: 10,
-        backgroundColor: 'white',
         margin: 20,
         padding: 10,
         alignItems: 'center',

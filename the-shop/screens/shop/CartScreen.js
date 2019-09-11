@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import DefaultText from './../../components/common/DefaultText';
 import TitleText from './../../components/common/TitleText';
 import CartItem from './../../components/shop/CartItem';
+import Card from './../../components/common/Card';
 
 // Actions
 import * as cartActions from './../../store/actions/cart';
@@ -64,12 +65,12 @@ const CartScreen = props => {
 
     return (
         <View style={styles.screen}>
-            <View style={styles.summary}>
+            <Card style={styles.summary}>
                 <DefaultText>
                     Total amount: <TitleText style={styles.title}>${totalAmount.toFixed(2)}</TitleText>
                 </DefaultText>
                 <Button color={Colors.primary} title="Order Now" disabled={cartItems.length === 0} onPress={createOrder} />
-            </View>
+            </Card>
             <View style={styles.list}>
                 <TitleText style={styles.listText}>Cart Items:</TitleText>
                 <FlatList
@@ -95,10 +96,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         marginBottom: 20,
-        padding: 10,
-        elevation: 5,
-        borderRadius: 10,
-        backgroundColor: 'white'
+        padding: 10
     },
     title: {
         fontSize: 14,

@@ -1,11 +1,10 @@
 import React from 'react';
-import { StyleSheet, View, Text, Image, Button, TouchableOpacity, TouchableNativeFeedback, Platform } from 'react-native';
+import { StyleSheet, View, Image, TouchableOpacity, TouchableNativeFeedback, Platform } from 'react-native';
 
 // Components
 import TitleText from './../common/TitleText';
 import DefaultText from './../common/DefaultText';
-
-import Colors from './../../constansts/Colors';
+import Card from './../common/Card';
 
 const ProductItem = props => {
     let TouchableCmp = TouchableOpacity;
@@ -16,7 +15,7 @@ const ProductItem = props => {
 
     return (
         <TouchableCmp onPress={props.onSelect} useForeground>
-            <View style={{ ...styles.product, ...props.style }}>
+            <Card style={{ ...styles.product, ...props.style }}>
                 <View style={styles.imgContainer}>
                     <Image style={styles.img} source={{ uri: props.img }} />
                 </View>
@@ -27,16 +26,13 @@ const ProductItem = props => {
                 <View style={styles.actions}>
                     {props.children}
                 </View>
-            </View>
+            </Card>
         </TouchableCmp>
     );
 };
 
 const styles = StyleSheet.create({
     product: {
-        elevation: 5,
-        borderRadius: 10,
-        backgroundColor: 'white',
         height: 300,
         margin: 20,
         overflow: 'hidden'
