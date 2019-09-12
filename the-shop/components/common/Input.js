@@ -1,28 +1,26 @@
 import React, { useReducer, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput } from 'react-native';
 
-const INPUT_CHANGE = 'INPUT_CHANGE';
-const LOST_FOCUS = 'LOST_FOCUS';
+const INPUT_UPDATE = 'INPUT_UPDATE';
+const INPUT_TOCHED = 'INPUT_TOCHED';
 
 const inputReducer = (state, action) => {
     switch (action.type) {
-        case INPUT_CHANGE: {
-            const { value, isValid } = action;
-            
+        case INPUT_UPDATE: {
+            const { value, isValid } = action.data;
+
             const updatedState = {
                 ...state,
                 value,
                 isValid
             };
-
             return updatedState;
         }
-        case LOST_FOCUS: {
+        case INPUT_TOCHED: {
             const updatedState = {
                 ...state,
-                toched: true
+                touched: true
             };
-
             return updatedState;
         }
         default: {
@@ -32,17 +30,18 @@ const inputReducer = (state, action) => {
 };
 
 const Input = props => {
+
     const [inputState, dispatch] = useReducer(inputReducer, {
-        value: props.initialValue ? props.initialValue : '',
-        isValid: props.initalValidity ? props.initalValidity : false,
-        toched: false
+        value: props.initValue ? props.initValue : '',
+        isValid: props.initIsValid ? props.initIsValid : '',
+        touched: false
     });
 
-    const { onInputChange } = props;
+    const { onInputChange, id } = props;
 
     useEffect(() => {
         if (inputState.touched) {
-            onInputChange(inputState.value, inputState.isValid);
+            onInputChange(id, inputState.value, inputState.isValid);
         }
     }, [inputState, onInputChange]);
 
@@ -67,14 +66,16 @@ const Input = props => {
         }
 
         dispatch({
-            type: INPUT_CHANGE,
-            value: text,
-            isValid
+            type: INPUT_UPDATE,
+            data: {
+                value: text,
+                isValid
+            }
         });
     };
 
-    const lostFocusHandler = () => {
-        dispatch({ type: LOST_FOCUS })
+    const touchHandler = () => {
+        dispatch({ type: INPUT_TOCHED });
     };
 
     return (
@@ -82,11 +83,15 @@ const Input = props => {
             <Text style={styles.label}>{props.label}</Text>
             <TextInput
                 {...props}
-                style={styles.input}
-                value={props.initialValue}
+                style={{ ...styles.input, ...props.style }}
+                value={inputState.value}
                 onChangeText={textChangeHandler}
-                onBlur={lostFocusHandler} />
-            <Text>{props.errorText}</Text>
+                onBlur={touchHandler} />
+            {!inputState.isValid && inputState.touched && (
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>{props.errorText}</Text>
+                </View>
+            )}
         </View>
     );
 };
@@ -104,6 +109,14 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         borderBottomColor: '#ccc',
         borderBottomWidth: 2
+    },
+    errorContainer: {
+        marginVertical: 8
+    },
+    errorText: {
+        fontFamily: 'open-sans',
+        fontSize: 12,
+        color: 'red'
     }
 });
 

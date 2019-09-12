@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useReducer } from 'react';
-import { StyleSheet, View, Text, TextInput, ScrollView, Platform, Alert } from 'react-native';
+import { StyleSheet, View, ScrollView, Platform, Alert, KeyboardAvoidingView } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -36,7 +36,6 @@ const formReducer = (state, action) => {
                 inputValidities: updatedValidities,
                 formIsValid: updatedFormIsValid
             };
-
             return updatedState;
         }
         default: {
@@ -98,7 +97,6 @@ const EditProductScreen = props => {
         if (product) {
             dispatch(productsActions.editProduct(
                 prodId,
-                product.ownerId,
                 formState.inputValues.title,
                 formState.inputValues.imgUrl,
                 formState.inputValues.description
@@ -121,46 +119,64 @@ const EditProductScreen = props => {
     }, [onSave]);
 
     return (
-        <ScrollView>
-            <View style={styles.form}>
-                <Input
-                    initialValue={formState.inputValues.title}
-                    initalValidity={formState.inputValidities.title}
-                    label="Title"
-                    errorText="Title is a required field"
-                    keyboardType='default'
-                    autoCorrect
-                    autoCapitalize='sentences'
-                    returnKeyType="next"
-                    onInputChange={inputChangeHandler.bind(this, inputTypes.title)} />
-                <Input
-                    initialValue={formState.inputValues.imgUrl}
-                    initalValidity={formState.inputValidities.imgUrl}
-                    label="Image URL"
-                    errorText="Image URL is a required field"
-                    keyboardType='default'
-                    returnKeyType="next" />
-                {product ? null : (
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior="padding"
+            keyboardVerticalOffset={100}  >
+            <ScrollView>
+                <View style={styles.form}>
                     <Input
-                        initialValue={formState.inputValues.price}
-                        initalValidity={formState.inputValidities.price}
-                        label="Price"
-                        errorText="Price is a required field"
-                        keyboardType='decimal-pad'
-                        returnKeyType="next" />
-                )}
-                <Input
-                    initialValue={formState.inputValues.description}
-                    initalValidity={formState.inputValidities.description}
-                    label="Description"
-                    errorText="Description is a required field"
-                    keyboardType='default'
-                    autoCorrect
-                    autoCapitalize='sentences'
-                    multiline
-                    numberOfLiners={5} />
-            </View>
-        </ScrollView>
+                        id={inputTypes.title}
+                        initValue={product ? product.title : ''}
+                        initIsValid={!!product}
+                        label="Title"
+                        errorText="Title is a required field"
+                        keyboardType='default'
+                        autoCorrect
+                        autoCapitalize='sentences'
+                        returnKeyType="next"
+                        required
+                        onInputChange={inputChangeHandler} />
+                    <Input
+                        id={inputTypes.imgUrl}
+                        initValue={product ? product.imageUrl : ''}
+                        initalValidity={!!product}
+                        label="Image URL"
+                        errorText="Image URL is a required field"
+                        keyboardType='default'
+                        returnKeyType="next"
+                        required
+                        onInputChange={inputChangeHandler} />
+                    {product ? null : (
+                        <Input
+                            id={inputTypes.price}
+                            initValue={product ? formState.inputValues.price : ''}
+                            initIsValid={!!product}
+                            label="Price"
+                            errorText="Price is a required field"
+                            keyboardType='decimal-pad'
+                            returnKeyType="next"
+                            required
+                            min={0}
+                            onInputChange={inputChangeHandler} />
+                    )}
+                    <Input
+                        id={inputTypes.description}
+                        initValue={product ? product.description : ''}
+                        initIsValid={!!product}
+                        label="Description"
+                        errorText="Description is a required field"
+                        keyboardType='default'
+                        autoCorrect
+                        autoCapitalize='sentences'
+                        multiline
+                        numberOfLiners={5}
+                        required
+                        minLength={10}
+                        onInputChange={inputChangeHandler} />
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 };
 
