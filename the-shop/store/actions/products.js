@@ -15,7 +15,7 @@ export const fetchProducts = () => {
             if (!response.ok) {
                 throw new Error('Something went wrong!');
             }
-    
+
             Object.keys(resData).forEach(id => {
                 const { title, imageUrl, description, price } = resData[id];
                 const product = new Product(id, 'u1', title, imageUrl, description, price);
@@ -31,10 +31,14 @@ export const fetchProducts = () => {
 
 export const deleteProduct = productId => {
     return async dispatch => {
-        await fetch(
+        const response = await fetch(
             `https://rn-guide-16165.firebaseio.com/products/${productId}.json`,
             { method: 'DELETE' }
-        )
+        );
+
+        if (!response.ok) {
+            throw new Error('Something went wrong!');
+        }
 
         dispatch({ type: DELETE_PRODUCT, productId });
     }
@@ -59,9 +63,14 @@ export const createProduct = (ownerId, title, imgUrl, price, description) => {
                 body: JSON.stringify(prodData)
             }
         );
+
+        if (!response.ok) {
+            throw new Error('Something went wrong!');
+        }
+
         const resData = await response.json();
 
-        prodData.id = resData.id;
+        prodData.id = resData.name;
         prodData.ownerId = ownerId;
     
         dispatch({
@@ -79,7 +88,7 @@ export const editProduct = (id, title, imgUrl, description) => {
             description
         };
 
-        await fetch(
+        const response = await fetch(
             `https://rn-guide-16165.firebaseio.com/products/${id}.json`,
             {
                 method: 'PATCH',
@@ -89,6 +98,10 @@ export const editProduct = (id, title, imgUrl, description) => {
                 body: JSON.stringify(newProdData)
             }
         );
+
+        if (!response.ok) {
+            throw new Error('Something went wrong!');
+        }
 
         newProdData.id = id;
         dispatch({ type: EDIT_PRODUCT, newProdData });

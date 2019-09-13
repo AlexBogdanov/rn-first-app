@@ -1,5 +1,12 @@
-import React from 'react';
-import { StyleSheet, View, Button, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+    StyleSheet,
+    View,
+    Button,
+    FlatList,
+    ActivityIndicator,
+    Alert
+} from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
 // Components
@@ -15,9 +22,18 @@ import * as ordersActions from './../../store/actions/orders';
 import Colors from './../../constansts/Colors';
 
 const CartScreen = props => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState();
+
     const { items, totalAmount } = useSelector(state => state.cart);
     const cartItems = [];
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (error) {
+            Alert.alert('An error occured!', error, [{ text: 'Okay!' }]);
+        }
+    }, [error]);
 
     Object.keys(items).forEach(key => {
         const cartItem = {
@@ -46,7 +62,7 @@ const CartScreen = props => {
     };
 
     const renderItem = itemData => {
-        const { item } = itemData
+        const { item } = itemData;
 
         return <CartItem
                     id={item.id}
@@ -59,27 +75,44 @@ const CartScreen = props => {
     };
 
     const createOrder = () => {
-        dispatch(ordersActions.addOrder(cartItems, totalAmount));
-        dispatch(cartActions.clearCart());
+        setError(null);
+        setIsLoading(true);
+
+        dispatch(ordersActions.addOrder(cartItems, totalAmount, 'u1'))
+            .then(() => {
+                dispatch(cartActions.clearCart());
+                setIsLoading(false);
+            }).catch(err => {
+                setError(err.message);
+                setIsLoading(false);
+            });
     };
 
-    return (
-        <View style={styles.screen}>
-            <Card style={styles.summary}>
-                <DefaultText>
-                    Total amount: <TitleText style={styles.title}>${totalAmount.toFixed(2)}</TitleText>
-                </DefaultText>
-                <Button color={Colors.primary} title="Order Now" disabled={cartItems.length === 0} onPress={createOrder} />
-            </Card>
-            <View style={styles.list}>
-                <TitleText style={styles.listText}>Cart Items:</TitleText>
-                <FlatList
-                    keyExtractor={item => item.id}
-                    data={cartItems}
-                    renderItem={renderItem} />
+    if (isLoading) {
+        return (
+            <View style={styles.centered}>
+                <ActivityIndicator size="large" color={Colors.primary} />
             </View>
-        </View>
-    );
+        );
+    } else {
+        return (
+            <View style={styles.screen}>
+                <Card style={styles.summary}>
+                    <DefaultText>
+                        Total amount: <TitleText style={styles.title}>${totalAmount.toFixed(2)}</TitleText>
+                    </DefaultText>
+                    <Button color={Colors.primary} title="Order Now" disabled={cartItems.length === 0} onPress={createOrder} />
+                </Card>
+                <View style={styles.list}>
+                    <TitleText style={styles.listText}>Cart Items:</TitleText>
+                    <FlatList
+                        keyExtractor={item => item.id}
+                        data={cartItems}
+                        renderItem={renderItem} />
+                </View>
+            </View>
+        );
+    }
 };
 
 CartScreen.navigationOptions = {
@@ -107,6 +140,11 @@ const styles = StyleSheet.create({
     },
     listText: {
         color: Colors.primary
+    },
+    centered: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center'
     }
 });
 

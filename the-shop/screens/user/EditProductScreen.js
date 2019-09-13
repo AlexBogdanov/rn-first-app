@@ -1,13 +1,22 @@
-import React, { useCallback, useEffect, useReducer } from 'react';
-import { StyleSheet, View, ScrollView, Platform, Alert, KeyboardAvoidingView } from 'react-native';
+import React, { useCallback, useEffect, useReducer, useState } from 'react';
+import {
+    StyleSheet,
+    View,
+    ScrollView,
+    Platform,
+    Alert,
+    KeyboardAvoidingView,
+    ActivityIndicator
+} from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { useSelector, useDispatch } from 'react-redux';
-
-import * as productsActions from './../../store/actions/products';
 
 // Components
 import CustomHeaderButton from './../../components/common/CustomHeaderButton';
 import Input from './../../components/common/Input';
+
+import * as productsActions from './../../store/actions/products';
+import Colors from './../../constansts/Colors';
 
 const FORM_UPDATE = 'FORM_UPDATE';
 
@@ -52,6 +61,9 @@ const inputTypes = {
 };
 
 const EditProductScreen = props => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState();
+
     const dispatch = useDispatch();
     const prodId = props.navigation.getParam('prodId');
 
@@ -75,6 +87,12 @@ const EditProductScreen = props => {
         formIsValid: product ? true : false
     });
 
+    useEffect(() => {
+        if (error) {
+            Alert.alert('An error occured!', error, [{ text: 'Okay!' }]);
+        }
+    }, [error]);
+
     const inputChangeHandler = useCallback((inputType, value, isValid) => {
         formDispatch({
             type: FORM_UPDATE,
@@ -94,14 +112,22 @@ const EditProductScreen = props => {
             return;
         }
 
+        setIsLoading(true);
+        setError(null);
+
         if (product) {
             dispatch(productsActions.editProduct(
                 prodId,
                 formState.inputValues.title,
                 formState.inputValues.imgUrl,
                 formState.inputValues.description
-            ));
-            props.navigation.goBack();
+            )).then(() => {
+                setIsLoading(false);
+                props.navigation.goBack();
+            }).catch(err => {
+                setError(err.message);
+                setIsLoading(false);
+            });
         } else {
             dispatch(productsActions.createProduct(
                 'u1',
@@ -109,8 +135,13 @@ const EditProductScreen = props => {
                 formState.inputValues.imgUrl,
                 Number(formState.inputValues.price),
                 formState.inputValues.description
-            ));
-            props.navigation.goBack();
+            )).then(() => {
+                setIsLoading(false);
+                props.navigation.goBack();
+            }).catch(err => {
+                setError(err.message);
+                setIsLoading(false);
+            })
         }
     }, [dispatch, prodId, product, formState]);
 
@@ -118,66 +149,74 @@ const EditProductScreen = props => {
         props.navigation.setParams({ 'onSave': onSave });
     }, [onSave]);
 
-    return (
-        <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior="padding"
-            keyboardVerticalOffset={100}  >
-            <ScrollView>
-                <View style={styles.form}>
-                    <Input
-                        id={inputTypes.title}
-                        initValue={product ? product.title : ''}
-                        initIsValid={!!product}
-                        label="Title"
-                        errorText="Title is a required field"
-                        keyboardType='default'
-                        autoCorrect
-                        autoCapitalize='sentences'
-                        returnKeyType="next"
-                        required
-                        onInputChange={inputChangeHandler} />
-                    <Input
-                        id={inputTypes.imgUrl}
-                        initValue={product ? product.imageUrl : ''}
-                        initalValidity={!!product}
-                        label="Image URL"
-                        errorText="Image URL is a required field"
-                        keyboardType='default'
-                        returnKeyType="next"
-                        required
-                        onInputChange={inputChangeHandler} />
-                    {product ? null : (
+    if (isLoading) {
+        return (
+            <View style={styles.centered}>
+                <ActivityIndicator size="large" color={Colors.primary} />
+            </View>
+        );
+    } else {
+        return (
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior="padding"
+                keyboardVerticalOffset={100}  >
+                <ScrollView>
+                    <View style={styles.form}>
                         <Input
-                            id={inputTypes.price}
-                            initValue={product ? formState.inputValues.price : ''}
+                            id={inputTypes.title}
+                            initValue={product ? product.title : ''}
                             initIsValid={!!product}
-                            label="Price"
-                            errorText="Price is a required field"
-                            keyboardType='decimal-pad'
+                            label="Title"
+                            errorText="Title is a required field"
+                            keyboardType='default'
+                            autoCorrect
+                            autoCapitalize='sentences'
                             returnKeyType="next"
                             required
-                            min={0}
                             onInputChange={inputChangeHandler} />
-                    )}
-                    <Input
-                        id={inputTypes.description}
-                        initValue={product ? product.description : ''}
-                        initIsValid={!!product}
-                        label="Description"
-                        errorText="Description is a required field"
-                        keyboardType='default'
-                        autoCorrect
-                        autoCapitalize='sentences'
-                        multiline
-                        numberOfLiners={5}
-                        required
-                        minLength={10}
-                        onInputChange={inputChangeHandler} />
-                </View>
-            </ScrollView>
-        </KeyboardAvoidingView>
-    );
+                        <Input
+                            id={inputTypes.imgUrl}
+                            initValue={product ? product.imageUrl : ''}
+                            initalValidity={!!product}
+                            label="Image URL"
+                            errorText="Image URL is a required field"
+                            keyboardType='default'
+                            returnKeyType="next"
+                            required
+                            onInputChange={inputChangeHandler} />
+                        {product ? null : (
+                            <Input
+                                id={inputTypes.price}
+                                initValue={product ? formState.inputValues.price : ''}
+                                initIsValid={!!product}
+                                label="Price"
+                                errorText="Price is a required field"
+                                keyboardType='decimal-pad'
+                                returnKeyType="next"
+                                required
+                                min={0}
+                                onInputChange={inputChangeHandler} />
+                        )}
+                        <Input
+                            id={inputTypes.description}
+                            initValue={product ? product.description : ''}
+                            initIsValid={!!product}
+                            label="Description"
+                            errorText="Description is a required field"
+                            keyboardType='default'
+                            autoCorrect
+                            autoCapitalize='sentences'
+                            multiline
+                            numberOfLiners={5}
+                            required
+                            minLength={10}
+                            onInputChange={inputChangeHandler} />
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        );
+    }
 };
 
 EditProductScreen.navigationOptions = navData => {
@@ -203,6 +242,11 @@ const styles = StyleSheet.create({
     form: {
         flex: 1,
         padding: 20
+    },
+    centered: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center'
     }
 });
 
